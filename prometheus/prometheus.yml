@@ -1,0 +1,17 @@
+global:
+  scrape_interval: 15s  # Prometheus will scrape (collect) metrics every 15 seconds
+
+scrape_configs:  # List of all the targets (jobs) Prometheus should scrape metrics from
+
+  - job_name: 'prometheus'  # Name of this scrape job
+    static_configs:
+      - targets: ['prometheus:9090']  # Prometheus will scrape its own metrics from this internal Docker network address
+
+  - job_name: 'node-exporter'  # Collect system-level metrics (CPU, memory, disk) from node-exporter
+    static_configs:
+      - targets: ['node-exporter:9100']  # Access node-exporter service inside the Docker network
+
+  - job_name: 'cadvisor'  # Collect Docker container metrics from cAdvisor
+    static_configs:
+      - targets: ['cadvisor:8080']  # Access cAdvisor service by its Docker Compose name
+

@@ -1,0 +1,36 @@
+version: '3'  # Docker Compose file format version
+
+services:
+  prometheus:  # Prometheus collects metrics from exporters and stores them
+    image: prom/prometheus  # Official Prometheus Docker image
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml  # Mount custom config into container
+    ports:
+      - "9090:9090"  # Expose Prometheus UI at http://localhost:9090
+
+  node-exporter:  # Exports system-level metrics like CPU, memory, disk, etc.
+    image: prom/node-exporter  # Official Node Exporter image
+    ports:
+      - "9100:9100"  # Metrics available at http://localhost:9100/metrics
+
+  cadvisor:  # Exports container-level metrics (CPU, RAM, FS usage per container)
+    image: gcr.io/cadvisor/cadvisor:v0.47.2  # Google’s cAdvisor image
+    ports:
+      - "8080:8080"  # Web UI at http://localhost:8080
+    volumes:
+      - /:/rootfs:ro  # Mount root filesystem as read-only
+      - /var/run:/var/run:ro  # Process info and Docker socket
+      - /sys:/sys:ro  # System information
+      - /var/lib/docker/:/var/lib/docker:ro  # Docker data (container info)
+      - /dev/disk/:/dev/disk:ro  # Disk device metrics (optional but useful)
+
+  grafana:  # Dashboarding tool to visualize metrics from Prometheus
+    image: grafana/grafana  # Official Grafana image
+    ports:
+      - "3000:3000"  # Grafana UI accessible at http://localhost:3000
+    volumes:
+      - grafana-data:/var/lib/grafana  # Persist Grafana dashboards & settings
+
+volumes:
+  grafana-data:  # Named volume to store Grafana data outside the container
+
